@@ -9,17 +9,15 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression  # Placeholder for an actual ML model
 from datetime import datetime
 import csv
+from pygrabber.dshow_graph import FilterGraph
 
 
 # Simulated Machine Learning Model for Posture Detection
 class PostureDetectionModel:
     def __init__(self):
-        # Placeholder for model initialization; in practice, load a pre-trained model
         self.model = LogisticRegression()
 
     def predict(self, sensor_data):
-        """Predicts postural deviations based on sensor data. Replace this with a real model."""
-        # Example: based on thresholds or actual ML classification
         predictions = []
         if sensor_data['hip_flexion'] > 30 or sensor_data['hip_flexion'] < -30:
             predictions.append("Hip Flexion Issue")
@@ -61,9 +59,23 @@ class PostureMonitorApp(tk.Tk):
         self.model = PostureDetectionModel()
         self.logger = DataLogger()
 
+        # Initialize camera ID to None
+        self.camera_id = None
+        self.monitoring = False
+
         # UI Elements
+        self.create_ui()
+
+    def create_ui(self):
         self.label = tk.Label(self, text="Real-Time Posture Feedback", font=("Arial", 16))
         self.label.pack(pady=10)
+
+        self.camera_selector_label = tk.Label(self, text="Select Camera:", font=("Arial", 12))
+        self.camera_selector_label.pack(pady=5)
+
+        self.camera_selector = ttk.Combobox(self, state="readonly")
+        self.camera_selector["values"] = self.detect_cameras()
+        self.camera_selector.pack(pady=5)
 
         self.output_frame = tk.Frame(self)
         self.output_frame.pack(pady=20)
@@ -91,10 +103,20 @@ class PostureMonitorApp(tk.Tk):
         # For live data plotting
         self.data_history = {"hip_flexion": [], "knee_extension": [], "spine_angle": []}
 
-        self.monitoring = False
+    def detect_cameras(self):
+        """Uses pygrabber to detect connected cameras."""
+        graph = FilterGraph()
+        devices = graph.get_input_devices()
+        return devices
 
     def start_monitoring(self):
         """Starts the posture monitoring in a separate thread."""
+        selected_camera = self.camera_selector.get()
+        if not selected_camera:
+            self.alert_label.config(text="Please select a camera.")
+            return
+
+        self.camera_id = self.camera_selector.current()
         if not self.monitoring:
             self.monitoring = True
             threading.Thread(target=self.update_monitoring, daemon=True).start()
@@ -110,26 +132,16 @@ class PostureMonitorApp(tk.Tk):
     def update_monitoring(self):
         """Updates the posture data and feedback in real time."""
         while self.monitoring:
-            # Acquire and display sensor data
             sensor_data = self.acquire_sensor_data()
             self.update_ui(sensor_data)
-
-            # Predict issues with the machine learning model
             issues = self.model.predict(sensor_data)
-
-            # Log data and issues
             self.logger.log(sensor_data, issues)
 
-            # Update alert label
             if issues:
                 self.alert_label.config(text="Posture Alerts: " + "; ".join(issues))
             else:
                 self.alert_label.config(text="Posture is normal.")
-
-            # Update plot with new data
             self.update_plot(sensor_data)
-
-            # Delay for real-time simulation
             time.sleep(1)
 
     def update_ui(self, sensor_data):
@@ -140,13 +152,11 @@ class PostureMonitorApp(tk.Tk):
 
     def update_plot(self, sensor_data):
         """Updates the real-time data plot."""
-        # Append data to history
         for key, value in sensor_data.items():
             self.data_history[key].append(value)
-            if len(self.data_history[key]) > 50:  # Keep the last 50 points for display
+            if len(self.data_history[key]) > 50:
                 self.data_history[key].pop(0)
 
-        # Update each subplot
         self.ax[0].cla()
         self.ax[0].plot(self.data_history["hip_flexion"], color="blue")
         self.ax[0].set_title("Hip Flexion")
