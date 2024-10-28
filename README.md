@@ -54,7 +54,7 @@ The system’s modular design separates data acquisition, processing, and feedba
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/SteveProkovas/Motion-Analysis-and-Posture-Monitoring.git
+   git clone https://github.com/SteveProkovas/Motion-Analysis-and-Posture-Monitoring-System.git
    cd Motion-Analysis-and-Posture-Monitoring
    ```
 2. Install Python libraries:
