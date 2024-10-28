@@ -1,4 +1,4 @@
-# Motion Analysis and Posture Monitoring System Using Biomedical Sensors
+# Motion Analysis and Posture Monitoring System
 
 ## Project Overview
 
