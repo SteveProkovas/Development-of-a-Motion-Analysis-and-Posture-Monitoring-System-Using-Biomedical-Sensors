@@ -1,8 +1,8 @@
-# Development of a Motion Analysis and Posture Monitoring System Using Biomedical Sensors
+# Motion Analysis and Posture Monitoring System Using Biomedical Sensors
 
 ## Project Overview
 
-This project focuses on creating a wearable biomedical system for monitoring and improving body posture and mobility. Utilizing sensors strategically placed on key body areas (e.g., back, neck, knees), the system records data on movement and posture in real time. This data is analyzed using Python algorithms incorporating discrete mathematics and machine learning, providing immediate feedback to users. A Field-Programmable Gate Array (FPGA) serves as the backbone for digital control and processing, enabling rapid, real-time feedback.
+This project provides a wearable biomedical system to monitor and improve posture and mobility. Sensors positioned at key anatomical points collect real-time data, which is processed using Python-based algorithms and FPGA technology to give immediate feedback, assisting users in maintaining proper posture and preventing musculoskeletal issues.
 
 ## Table of Contents
 - [Project Overview](#project-overview)
@@ -12,53 +12,44 @@ This project focuses on creating a wearable biomedical system for monitoring and
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Code Overview](#code-overview)
 - [License](#license)
 
 ## Motivation
 
-Modern lifestyles often lead to poor posture and increased risk of musculoskeletal issues, impacting both physical health and quality of life. Existing posture-monitoring systems are often limited by either processing speed, delayed feedback, or lack of real-time analysis. This project aims to address these limitations by integrating robust data processing capabilities with a wearable, real-time system. By leveraging FPGA technology alongside Python-based data analysis, this solution aims to ensure timely, accurate feedback and improve user mobility and posture through prompt corrective action.
+With modern lifestyles leading to common postural problems, this system addresses the need for real-time posture monitoring. Using an FPGA for rapid data processing and Python for algorithmic analysis, this project offers immediate corrective feedback and insights into postural health.
 
 ## Software Architecture
 
-The system’s software architecture is modular, enabling clear separation of functionalities for efficient data acquisition, processing, and feedback delivery.
+The system’s modular design separates data acquisition, processing, and feedback:
 
 1. **Data Acquisition Layer (Biomedical Sensors):**
-   - Sensors, including accelerometers and gyroscopes, are strategically placed at key anatomical points.
-   - Sensor data is collected on angular movements, rotations, and orientations, generating metrics such as joint angles and posture deviations.
-   - A low-power, wireless protocol is used for data transmission to reduce latency and optimize power usage.
+   - Sensors collect angles and deviations from key body areas and send data wirelessly for real-time analysis.
 
 2. **Data Processing Layer (FPGA):**
-   - Sensor data streams into an FPGA, which performs initial filtering, aggregation, and normalization of raw data.
-   - The FPGA handles real-time data synchronization from various sensor nodes and sends pre-processed data to the main analysis unit.
-   - Rapid, hardware-level data management ensures minimal delays in user feedback.
+   - An FPGA preprocesses the sensor data for efficient pipeline delivery to Python-based analysis.
 
-3. **Analysis and Feedback Layer (Python and Discrete Mathematics):**
-   - The processed data is analyzed by algorithms written in Python that utilize discrete mathematics and machine learning.
-   - Algorithms detect abnormal posture or deviations based on established patterns and standards.
-   - If an issue is detected, the system issues alerts or corrective feedback to the user via a mobile or desktop interface.
-   - Data is logged for historical tracking and further analysis to aid in personalized posture correction strategies.
-
+3. **Analysis and Feedback Layer (Python):**
+   - Algorithms detect posture deviations, alert users, and log data for progress tracking.
+   
 4. **User Interface Layer:**
-   - A user-friendly dashboard displays real-time posture information, historical data trends, and corrective action suggestions.
-   - The interface integrates notifications for posture correction and supports customizable settings for alerts and feedback.
+   - A dashboard visualizes real-time metrics, historical trends, and feedback for a seamless user experience.
 
 ## Features
-- **Real-Time Posture Detection and Monitoring:** Continuous tracking of posture with immediate feedback for correction.
-- **Wearable Sensor System:** Compact, low-profile sensors that maintain user comfort and minimize restrictions on mobility.
-- **Data Processing with FPGA:** High-speed data handling and processing to ensure low-latency feedback.
-- **Python-Based Algorithmic Analysis:** Machine learning and discrete mathematics algorithms detect posture deviations.
-- **User-Friendly Interface:** Intuitive UI for real-time visualization and historical trend analysis.
+- **Real-Time Posture Feedback:** Instant correction guidance.
+- **Wearable Sensors:** Comfortable, everyday use.
+- **FPGA Processing:** Optimized low-latency response.
+- **Python-Based Analysis:** Detection of posture deviations using machine learning.
+- **User-Friendly Dashboard:** Real-time visualization and trend analysis.
 
 ## Requirements
 - **Hardware:**
-  - Biomedical sensors (accelerometers, gyroscopes)
-  - FPGA for data processing
-  - Computer or mobile device for data display
+  - Biomedical sensors
+  - FPGA
 - **Software:**
   - Python (>=3.8)
-  - Machine learning libraries (e.g., scikit-learn, TensorFlow)
-  - Discrete mathematics libraries (e.g., SciPy)
-  - FPGA programming tools (specific to chosen hardware)
+  - Libraries: scikit-learn, TensorFlow, SciPy, etc.
+  - FPGA programming tools
 
 ## Installation
 1. Clone the repository:
@@ -66,22 +57,95 @@ The system’s software architecture is modular, enabling clear separation of fu
    git clone https://github.com/SteveProkovas/Motion-Analysis-and-Posture-Monitoring.git
    cd Motion-Analysis-and-Posture-Monitoring
    ```
-2. Install the required Python libraries:
+2. Install Python libraries:
    ```bash
    pip install -r requirements.txt
    ```
-3. Follow the FPGA setup documentation to configure and deploy the FPGA program.
+3. Set up and configure the FPGA.
 
 ## Usage
-1. Connect the sensors to the target body points as specified.
-2. Run the data acquisition program.
+1. Connect sensors to the specified body points.
+2. Run the data acquisition program:
    ```bash
    python acquisition.py
    ```
-3. Visualize and monitor posture in real-time through the provided user interface:
+3. Start the main application for real-time feedback:
    ```bash
    python main.py
    ```
+
+## Code Overview
+
+Here’s a brief look at some main functions of the project:
+
+### **Main Application**: `PostureMonitorApp`
+
+```python
+class PostureMonitorApp(tk.Tk):
+    def __init__(self):
+        # Initialize model and logger
+        self.model = PostureDetectionModel()
+        self.logger = DataLogger()
+        ...
+        
+    def acquire_sensor_data(self):
+        """Simulates acquiring data from sensors."""
+        return {
+            'hip_flexion': random.uniform(-45, 45),
+            'knee_extension': random.uniform(0, 90),
+            'spine_angle': random.uniform(-30, 30)
+        }
+
+    def update_monitoring(self):
+        """Real-time posture feedback."""
+        while self.monitoring:
+            sensor_data = self.acquire_sensor_data()
+            self.update_ui(sensor_data)
+            issues = self.model.predict(sensor_data)
+            self.logger.log(sensor_data, issues)
+            ...
+```
+
+### **Posture Prediction Model**: `PostureDetectionModel`
+
+```python
+class PostureDetectionModel:
+    def __init__(self):
+        self.model = LogisticRegression()  # Placeholder for an actual ML model
+        
+    def predict(self, sensor_data):
+        """Predicts posture issues based on thresholds or ML classifications."""
+        predictions = []
+        if sensor_data['hip_flexion'] > 30 or sensor_data['hip_flexion'] < -30:
+            predictions.append("Hip Flexion Issue")
+        if sensor_data['knee_extension'] < 15:
+            predictions.append("Knee Extension Issue")
+        if sensor_data['spine_angle'] > 20 or sensor_data['spine_angle'] < -20:
+            predictions.append("Spine Angle Deviation")
+        return predictions
+```
+
+### **Data Logging**: `DataLogger`
+
+```python
+class DataLogger:
+    def __init__(self, filename="posture_log.csv"):
+        self.filename = filename
+        with open(self.filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Timestamp", "Hip Flexion", "Knee Extension", "Spine Angle", "Issues"])
+    
+    def log(self, sensor_data, issues):
+        with open(self.filename, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([
+                datetime.now(),
+                sensor_data['hip_flexion'],
+                sensor_data['knee_extension'],
+                sensor_data['spine_angle'],
+                "; ".join(issues)
+            ])
+```
 
 ## License
 This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
